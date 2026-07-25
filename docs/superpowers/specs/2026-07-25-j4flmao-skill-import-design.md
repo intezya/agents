@@ -2,7 +2,7 @@
 
 ## Goal
 
-Import the 33 explicitly requested skills from
+Import the 38 explicitly requested skills from
 `j4flmao/agent-skills`, organize them within the repository's existing
 taxonomy, replace the two existing Dockerfile-specific skills as requested,
 and preserve complementary skills that do not conflict.
@@ -78,6 +78,14 @@ Place the payment skill at:
 
 - `skills/ecommerce/payment-processing`
 
+Place the five persona skills in a dedicated top-level category:
+
+- `skills/personas/system-architect`
+- `skills/personas/security-engineer`
+- `skills/personas/devops-sre-engineer`
+- `skills/personas/backend-engineer`
+- `skills/personas/ai-architect`
+
 ## Overlap Decisions
 
 Keep the existing `skills/devops/security/incident-response`. It is a
@@ -113,7 +121,7 @@ plan.
 
 Before completion:
 
-1. Confirm all 33 expected `SKILL.md` files exist at their destination.
+1. Confirm all 38 expected `SKILL.md` files exist at their destination.
 2. Compare every imported directory against its pinned upstream source,
    including file manifests and file contents.
 3. Validate every imported `SKILL.md` frontmatter block and confirm skill
@@ -128,6 +136,7 @@ Before completion:
 ## Success Criteria
 
 - All requested skills are present in the approved semantic categories.
+- All five requested personas are present under `skills/personas`.
 - Only the two explicitly replaced Dockerfile skills are removed.
 - Both incident-response specialties remain discoverable under distinct
   frontmatter names.
