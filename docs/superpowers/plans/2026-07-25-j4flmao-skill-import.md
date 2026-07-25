@@ -1,65 +1,68 @@
-# j4flmao Skill Import Implementation Plan
+# Curated j4flmao Skill Import Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Import the 38 approved j4flmao skills, replace the two existing Dockerfile-specific skills, validate exact source parity, and publish the result on `master`.
+**Goal:** Import 109 approved j4flmao skills, remove two replaced Dockerfile skills, validate the curated source manifests, and publish the result on `master`.
 
-**Architecture:** Treat the selected upstream directories as pinned vendored content and copy them without rewriting. Organize them by the semantic taxonomy approved in the design spec, keep complementary incident-response, GitLab CI, Helm, and container-hardening skills, and verify every imported directory against the pinned source before publishing.
+**Architecture:** Vendor 74 selected upstream directories in full and construct 35 backend functional slices from each entrypoint plus its directly named existing references. Preserve upstream content except trailing end-of-line whitespace, keep the known 80 unresolved-reference baseline, and reject all unapproved source paths.
 
-**Tech Stack:** Git, GitHub CLI, POSIX file utilities, Ruby standard library (`yaml`), Markdown.
+**Tech Stack:** Git, GitHub CLI, Ruby standard library (`fileutils`, `yaml`), POSIX file utilities, Markdown.
 
 ## Global Constraints
 
-- Work only in `/Users/kurumi/Projects/agents/.worktrees/feat-add-developer-skills` on branch `feat/add-engineering-skills` until the integration task.
+- Work only in `/Users/kurumi/Projects/agents/.worktrees/feat-add-developer-skills` on branch `feat/add-engineering-skills` until integration.
 - Prefix every shell command with `rtk`.
-- Use `j4flmao/agent-skills` commit `1a3d5f4026cd30ca471f66df083cda44d4ddaa4e`.
-- Copy each requested directory in full without rewriting its `SKILL.md` or `references/` files.
-- If upstream trailing spaces make `git diff --check` fail, remove trailing spaces only, record that parity exception, and verify content with `git diff --no-index --ignore-space-at-eol`.
-- The pinned source has 64 unresolved local `references/*.md` targets across the selected entrypoints; preserve and report that exact upstream baseline instead of inventing missing files or silently retargeting links.
-- Import only the 38 approved skills; do not bulk-import any other upstream content.
+- Use upstream commit `1a3d5f4026cd30ca471f66df083cda44d4ddaa4e`.
+- Copy 74 approved directories in full.
+- For 35 backend skills, copy only `SKILL.md` plus existing `references/*.md` files directly named by that entrypoint.
+- Preserve exactly 80 selected-entrypoint unresolved references.
 - Remove only `skills/devops/containers/dockerfile-generator` and `skills/devops/containers/dockerfile-validator`.
-- Preserve the existing security-focused `skills/devops/security/incident-response`.
-- Do not execute any command, script, rollback, scaling action, forensic procedure, or infrastructure operation described by imported documentation.
-- Treat operational examples as reference material requiring human review, environment-specific adaptation, a dry run where practical, and a rollback plan.
-- Integrate through the repository's `master` branch and verify the published remote commit.
+- Do not execute any command embedded in imported documentation.
+- Integrate only through `master` after static validation passes.
 
 ---
 
-### Task 1: Import design, developer, ecommerce, and persona skills
+### Task 1: Verify the isolated baseline and pinned source
 
 **Files:**
-- Create: `skills/design/`
-- Create: `skills/developer/readme-writer/`
-- Create: `skills/developer/security-auditor/`
-- Create: `skills/ecommerce/payment-processing/`
-- Create: `skills/personas/system-architect/`
-- Create: `skills/personas/security-engineer/`
-- Create: `skills/personas/devops-sre-engineer/`
-- Create: `skills/personas/backend-engineer/`
-- Create: `skills/personas/ai-architect/`
+- Verify: repository worktree
+- Create outside repository: `/tmp/agents-j4flmao-1a3d5f40`
 
 **Interfaces:**
-- Consumes: pinned upstream checkout at `/tmp/agents-j4flmao-1a3d5f40`.
-- Produces: 16 complete imported skill directories with source-identical content.
+- Consumes: clean feature worktree and GitHub source.
+- Produces: clean pinned upstream checkout.
 
-- [ ] **Step 1: Verify the worktree and source target are safe**
+- [ ] **Step 1: Verify the linked worktree**
 
 Run:
 
 ```bash
 rtk git status --short --branch
-rtk proxy test ! -e /tmp/agents-j4flmao-1a3d5f40
-rtk proxy test ! -e skills/design
-rtk proxy test ! -e skills/developer/readme-writer
-rtk proxy test ! -e skills/developer/security-auditor
-rtk proxy test ! -e skills/ecommerce
-rtk proxy test ! -e skills/personas
+rtk git rev-parse --git-dir
+rtk git rev-parse --git-common-dir
+rtk git branch --show-current
 ```
 
-Expected: branch `feat/add-engineering-skills`, clean worktree, and every `test`
-exits successfully.
+Expected: clean `feat/add-engineering-skills`; Git dir differs from the common
+dir.
 
-- [ ] **Step 2: Create a pinned upstream checkout**
+- [ ] **Step 2: Run baseline static validation**
+
+Run the repository-wide frontmatter validator from Task 5 before importing.
+
+Expected: 49 valid skill frontmatters with unique names.
+
+- [ ] **Step 3: Verify RED import preconditions**
+
+Run:
+
+```bash
+rtk proxy ruby -e 'paths=%w[skills/design/accessibility skills/planning/create-prd skills/quality/unit-testing skills/devops/security/zero-trust skills/developer/backend/go/architecture skills/developer/backend/database-patterns skills/personas/system-architect]; missing=paths.reject{|path| File.file?(File.join(path,"SKILL.md"))}; abort "expected RED: missing #{missing.length}/#{paths.length}" unless missing.empty?'
+```
+
+Expected: nonzero exit with all seven representative destinations missing.
+
+- [ ] **Step 4: Create or verify the pinned source checkout**
 
 Run:
 
@@ -70,502 +73,322 @@ rtk git -C /tmp/agents-j4flmao-1a3d5f40 rev-parse HEAD
 rtk git -C /tmp/agents-j4flmao-1a3d5f40 status --short --branch
 ```
 
-Expected: HEAD is exactly
-`1a3d5f4026cd30ca471f66df083cda44d4ddaa4e` and the temporary checkout is
-clean.
-
-- [ ] **Step 3: Copy the approved non-DevOps directories**
-
-Run from the worktree:
-
-```bash
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/design skills/design
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/dev-loop/readme-writer skills/developer/readme-writer
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/dev-loop/security-auditor skills/developer/security-auditor
-rtk proxy mkdir -p skills/ecommerce
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/ecommerce/payment-processing skills/ecommerce/payment-processing
-rtk proxy mkdir -p skills/personas
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/personas/system-architect skills/personas/system-architect
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/personas/security-engineer skills/personas/security-engineer
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/personas/devops-sre-engineer skills/personas/devops-sre-engineer
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/personas/backend-engineer skills/personas/backend-engineer
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/personas/ai-architect skills/personas/ai-architect
-```
-
-Expected: all 16 destination directories exist.
-
-- [ ] **Step 4: Verify exact parity for the imported directories**
-
-Run:
-
-```bash
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/design skills/design
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/dev-loop/readme-writer skills/developer/readme-writer
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/dev-loop/security-auditor skills/developer/security-auditor
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/ecommerce/payment-processing skills/ecommerce/payment-processing
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/personas/system-architect skills/personas/system-architect
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/personas/security-engineer skills/personas/security-engineer
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/personas/devops-sre-engineer skills/personas/devops-sre-engineer
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/personas/backend-engineer skills/personas/backend-engineer
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/personas/ai-architect skills/personas/ai-architect
-```
-
-Expected: every command exits `0` with no output.
-
-- [ ] **Step 5: Normalize only upstream trailing whitespace**
-
-Run:
-
-```bash
-rtk proxy find skills/design skills/developer/readme-writer skills/developer/security-auditor skills/ecommerce skills/personas -type f -name '*.md' -exec perl -pi -e 's/[ \t]+$//' {} +
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/design skills/design
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/dev-loop/readme-writer skills/developer/readme-writer
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/dev-loop/security-auditor skills/developer/security-auditor
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/ecommerce/payment-processing skills/ecommerce/payment-processing
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/personas/system-architect skills/personas/system-architect
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/personas/security-engineer skills/personas/security-engineer
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/personas/devops-sre-engineer skills/personas/devops-sre-engineer
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/personas/backend-engineer skills/personas/backend-engineer
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/personas/ai-architect skills/personas/ai-architect
-```
-
-Expected: all commands exit `0`. Differences from upstream, if any, are
-limited to trailing spaces at end of line.
-
-- [ ] **Step 6: Commit the non-DevOps imports**
-
-Run:
-
-```bash
-rtk git add skills/design skills/developer/readme-writer skills/developer/security-auditor skills/ecommerce skills/personas
-rtk git diff --cached --check
-rtk git commit -m "feat: add design and persona skills"
-```
-
-Expected: whitespace check passes and the commit contains only the 16 approved
-skill directories.
+Expected: exact pinned SHA and clean detached checkout.
 
 ---
 
-### Task 2: Replace Dockerfile skills and import categorized DevOps skills
+### Task 2: Import the 74 full directories
 
 **Files:**
-- Delete: `skills/devops/containers/dockerfile-generator/`
-- Delete: `skills/devops/containers/dockerfile-validator/`
-- Create: `skills/devops/containers/docker/`
-- Create: `skills/devops/containers/docker-patterns/`
-- Create: `skills/devops/ci-cd/gitlab-ci/`
-- Create: `skills/devops/delivery/argo-cd/`
-- Create: `skills/devops/delivery/gitops/`
-- Create: `skills/devops/delivery/gitops-advanced/`
-- Create: `skills/devops/delivery/progressive-delivery/`
-- Create: `skills/devops/kubernetes/helm-patterns/`
-- Create: `skills/devops/kubernetes/kubernetes/`
-- Create: `skills/devops/kubernetes/kubernetes-patterns/`
-- Create: `skills/devops/kubernetes/kubernetes-autoscaling/`
-- Create: `skills/devops/kubernetes/kubernetes-for-data/`
-- Create: `skills/devops/kubernetes/kubernetes-operators/`
-- Create: `skills/devops/kubernetes/longhorn/`
-- Create: `skills/devops/observability/monitoring/`
-- Create: `skills/devops/observability/observability/`
-- Create: `skills/devops/observability/opentelemetry/`
-- Create: `skills/devops/operations/incident-response/`
-- Create: `skills/devops/operations/sre-practices/`
-- Create: `skills/devops/infrastructure/network-infrastructure/`
-- Create: `skills/devops/security/policy-as-code/`
-- Create: `skills/devops/security/vault/`
+- Create: approved design, developer workflow, DevOps, planning, quality, security, ecommerce, and persona directories
+- Delete: two Dockerfile skill directories
 
 **Interfaces:**
-- Consumes: verified pinned checkout from Task 1 and the existing repository taxonomy.
-- Produces: 22 source-identical DevOps skill directories, with only the two approved Dockerfile directories removed.
+- Consumes: pinned checkout from Task 1.
+- Produces: 74 complete source-directory copies.
 
-- [ ] **Step 1: Verify exact deletion and creation targets**
-
-Run:
-
-```bash
-rtk proxy test -d skills/devops/containers/dockerfile-generator
-rtk proxy test -d skills/devops/containers/dockerfile-validator
-rtk proxy test -d skills/devops/security/incident-response
-rtk proxy test -d skills/devops/security/container-hardening
-rtk proxy test ! -e skills/devops/containers/docker
-rtk proxy test ! -e skills/devops/containers/docker-patterns
-rtk proxy test ! -e skills/devops/ci-cd/gitlab-ci
-rtk proxy test ! -e skills/devops/delivery
-rtk proxy test ! -e skills/devops/kubernetes/helm-patterns
-rtk proxy test ! -e skills/devops/kubernetes/kubernetes
-rtk proxy test ! -e skills/devops/observability/monitoring
-rtk proxy test ! -e skills/devops/operations
-rtk proxy test ! -e skills/devops/infrastructure/network-infrastructure
-rtk proxy test ! -e skills/devops/security/policy-as-code
-rtk proxy test ! -e skills/devops/security/vault
-```
-
-Expected: every precondition passes. The two removal targets exist, preserved
-security skills exist, and all new destinations are absent.
-
-- [ ] **Step 2: Remove only the two approved Dockerfile skills**
+- [ ] **Step 1: Remove only the approved Dockerfile skills**
 
 Run:
 
 ```bash
 rtk git rm -r skills/devops/containers/dockerfile-generator
 rtk git rm -r skills/devops/containers/dockerfile-validator
-rtk proxy test ! -e skills/devops/containers/dockerfile-generator
-rtk proxy test ! -e skills/devops/containers/dockerfile-validator
 ```
 
-Expected: both directories are staged as deletions. The operation remains
-recoverable from Git history.
+Expected: only those two directories are staged as deletions.
 
-- [ ] **Step 3: Copy containers, CI/CD, and delivery skills**
+- [ ] **Step 2: Copy the 38 original selections**
 
-Run:
+Use `FileUtils.cp_r` with this exact source-to-destination mapping:
 
-```bash
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/docker skills/devops/containers/docker
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/docker-patterns skills/devops/containers/docker-patterns
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitlab-ci skills/devops/ci-cd/gitlab-ci
-rtk proxy mkdir -p skills/devops/delivery
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/argo-cd skills/devops/delivery/argo-cd
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitops skills/devops/delivery/gitops
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitops-advanced skills/devops/delivery/gitops-advanced
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/progressive-delivery skills/devops/delivery/progressive-delivery
+```ruby
+design = %w[accessibility brand-identity design-systems information-architecture motion-design prototyping ux-research visual-design]
+devops = {
+  "docker" => "skills/devops/containers/docker",
+  "docker-patterns" => "skills/devops/containers/docker-patterns",
+  "gitlab-ci" => "skills/devops/ci-cd/gitlab-ci",
+  "argo-cd" => "skills/devops/delivery/argo-cd",
+  "gitops" => "skills/devops/delivery/gitops",
+  "gitops-advanced" => "skills/devops/delivery/gitops-advanced",
+  "progressive-delivery" => "skills/devops/delivery/progressive-delivery",
+  "helm-patterns" => "skills/devops/kubernetes/helm-patterns",
+  "kubernetes" => "skills/devops/kubernetes/kubernetes",
+  "kubernetes-patterns" => "skills/devops/kubernetes/kubernetes-patterns",
+  "kubernetes-autoscaling" => "skills/devops/kubernetes/kubernetes-autoscaling",
+  "kubernetes-for-data" => "skills/devops/kubernetes/kubernetes-for-data",
+  "kubernetes-operators" => "skills/devops/kubernetes/kubernetes-operators",
+  "longhorn" => "skills/devops/kubernetes/longhorn",
+  "monitoring" => "skills/devops/observability/monitoring",
+  "observability" => "skills/devops/observability/observability",
+  "opentelemetry" => "skills/devops/observability/opentelemetry",
+  "incident-response" => "skills/devops/operations/incident-response",
+  "sre-practices" => "skills/devops/operations/sre-practices",
+  "network-infrastructure" => "skills/devops/infrastructure/network-infrastructure",
+  "policy-as-code" => "skills/devops/security/policy-as-code",
+  "vault" => "skills/devops/security/vault"
+}
 ```
 
-Expected: seven new skill directories exist in the approved categories.
+Also copy:
 
-- [ ] **Step 4: Copy Kubernetes skills**
-
-Run:
-
-```bash
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/helm-patterns skills/devops/kubernetes/helm-patterns
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes skills/devops/kubernetes/kubernetes
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-patterns skills/devops/kubernetes/kubernetes-patterns
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-autoscaling skills/devops/kubernetes/kubernetes-autoscaling
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-for-data skills/devops/kubernetes/kubernetes-for-data
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-operators skills/devops/kubernetes/kubernetes-operators
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/longhorn skills/devops/kubernetes/longhorn
+```text
+skills/dev-loop/readme-writer -> skills/developer/readme-writer
+skills/dev-loop/security-auditor -> skills/developer/security-auditor
+skills/ecommerce/payment-processing -> skills/ecommerce/payment-processing
+skills/personas/{system-architect,security-engineer,devops-sre-engineer,backend-engineer,ai-architect} -> skills/personas/*
 ```
 
-Expected: seven new Kubernetes skill directories exist.
+Expected: 38 destination `SKILL.md` files exist.
 
-- [ ] **Step 5: Copy observability, operations, infrastructure, and security skills**
+- [ ] **Step 3: Copy planning and quality**
 
-Run:
+Copy these source directories to the same repository-relative destinations:
 
-```bash
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/monitoring skills/devops/observability/monitoring
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/observability skills/devops/observability/observability
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/opentelemetry skills/devops/observability/opentelemetry
-rtk proxy mkdir -p skills/devops/operations
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/incident-response skills/devops/operations/incident-response
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/sre-practices skills/devops/operations/sre-practices
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/network-infrastructure skills/devops/infrastructure/network-infrastructure
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/policy-as-code skills/devops/security/policy-as-code
-rtk proxy cp -R /tmp/agents-j4flmao-1a3d5f40/skills/devops/vault skills/devops/security/vault
+```text
+skills/planning/{bdd-atdd,bpmn-modeling,cost-benefit,create-brief,create-prd,create-roadmap,create-story,market-analysis,solution-architecture}
+skills/quality/{acceptance-testing,contract-testing,e2e-testing,exploratory-testing,integration-testing,load-testing,property-based-testing,regression-testing,smoke-testing,unit-testing,visual-testing}
 ```
 
-Expected: eight new skill directories exist and the two pre-existing
-security-focused directories remain unchanged.
+Expected: 20 additional destination `SKILL.md` files exist.
 
-- [ ] **Step 6: Verify parity for all 22 DevOps imports**
+- [ ] **Step 4: Copy the 16 approved security directories**
 
-Run `diff -qr` for each source/destination pair:
+Copy:
 
-```bash
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/docker skills/devops/containers/docker
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/docker-patterns skills/devops/containers/docker-patterns
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitlab-ci skills/devops/ci-cd/gitlab-ci
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/argo-cd skills/devops/delivery/argo-cd
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitops skills/devops/delivery/gitops
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitops-advanced skills/devops/delivery/gitops-advanced
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/progressive-delivery skills/devops/delivery/progressive-delivery
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/helm-patterns skills/devops/kubernetes/helm-patterns
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes skills/devops/kubernetes/kubernetes
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-patterns skills/devops/kubernetes/kubernetes-patterns
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-autoscaling skills/devops/kubernetes/kubernetes-autoscaling
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-for-data skills/devops/kubernetes/kubernetes-for-data
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-operators skills/devops/kubernetes/kubernetes-operators
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/longhorn skills/devops/kubernetes/longhorn
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/monitoring skills/devops/observability/monitoring
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/observability skills/devops/observability/observability
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/opentelemetry skills/devops/observability/opentelemetry
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/incident-response skills/devops/operations/incident-response
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/sre-practices skills/devops/operations/sre-practices
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/network-infrastructure skills/devops/infrastructure/network-infrastructure
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/policy-as-code skills/devops/security/policy-as-code
-rtk proxy diff -qr /tmp/agents-j4flmao-1a3d5f40/skills/devops/vault skills/devops/security/vault
+```text
+skills/security/{abac,api-security,container-security,cspm,data-security,edr-xdr,iam-governance,rbac,sast-dast,sbom,secrets-management,siem-engineering,soar-automation,soc-operations,threat-intelligence,zero-trust}
 ```
 
-Expected: every command exits `0` with no output.
+into matching directory names under `skills/devops/security`.
 
-- [ ] **Step 7: Normalize only upstream trailing whitespace**
-
-Run:
-
-```bash
-rtk proxy find skills/devops/containers/docker skills/devops/containers/docker-patterns skills/devops/ci-cd/gitlab-ci skills/devops/delivery skills/devops/kubernetes/helm-patterns skills/devops/kubernetes/kubernetes skills/devops/kubernetes/kubernetes-patterns skills/devops/kubernetes/kubernetes-autoscaling skills/devops/kubernetes/kubernetes-for-data skills/devops/kubernetes/kubernetes-operators skills/devops/kubernetes/longhorn skills/devops/observability/monitoring skills/devops/observability/observability skills/devops/observability/opentelemetry skills/devops/operations skills/devops/infrastructure/network-infrastructure skills/devops/security/policy-as-code skills/devops/security/vault -type f -name '*.md' -exec perl -pi -e 's/[ \t]+$//' {} +
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/docker skills/devops/containers/docker
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/docker-patterns skills/devops/containers/docker-patterns
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitlab-ci skills/devops/ci-cd/gitlab-ci
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/argo-cd skills/devops/delivery/argo-cd
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitops skills/devops/delivery/gitops
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/gitops-advanced skills/devops/delivery/gitops-advanced
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/progressive-delivery skills/devops/delivery/progressive-delivery
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/helm-patterns skills/devops/kubernetes/helm-patterns
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes skills/devops/kubernetes/kubernetes
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-patterns skills/devops/kubernetes/kubernetes-patterns
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-autoscaling skills/devops/kubernetes/kubernetes-autoscaling
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-for-data skills/devops/kubernetes/kubernetes-for-data
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/kubernetes-operators skills/devops/kubernetes/kubernetes-operators
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/longhorn skills/devops/kubernetes/longhorn
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/monitoring skills/devops/observability/monitoring
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/observability skills/devops/observability/observability
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/opentelemetry skills/devops/observability/opentelemetry
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/incident-response skills/devops/operations/incident-response
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/sre-practices skills/devops/operations/sre-practices
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/network-infrastructure skills/devops/infrastructure/network-infrastructure
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/policy-as-code skills/devops/security/policy-as-code
-rtk git diff --no-index --ignore-space-at-eol -- /tmp/agents-j4flmao-1a3d5f40/skills/devops/vault skills/devops/security/vault
-```
-
-Expected: all 22 source/destination comparisons exit `0`; only trailing
-end-of-line whitespace differs from upstream.
-
-- [ ] **Step 8: Verify overlap decisions and commit**
-
-Run:
-
-```bash
-rtk proxy sed -n '2p' skills/devops/security/incident-response/SKILL.md
-rtk proxy sed -n '2p' skills/devops/operations/incident-response/SKILL.md
-rtk proxy test -d skills/devops/ci-cd/gitlab-ci-generator
-rtk proxy test -d skills/devops/ci-cd/gitlab-ci-validator
-rtk proxy test -d skills/devops/kubernetes/helm-generator
-rtk proxy test -d skills/devops/kubernetes/helm-validator
-rtk proxy test -d skills/devops/security/container-hardening
-rtk git add skills/devops
-rtk git diff --cached --check
-rtk git commit -m "feat: add curated devops skills"
-```
-
-Expected: incident-response names are `incident-response` and
-`devops-incident-response`; complementary skills remain; the commit contains
-22 approved new directories and only the two approved Dockerfile-skill
-removals.
+Expected: 16 additional destination `SKILL.md` files exist; total full imports
+is 74.
 
 ---
 
-### Task 3: Run repository-wide static validation
+### Task 3: Import 35 backend functional slices
 
 **Files:**
-- Verify: all `skills/**/SKILL.md`
-- Verify: all imported Markdown references
-- Verify: Git diff from design commit `6381246`
+- Create: `skills/developer/backend/**`
 
 **Interfaces:**
-- Consumes: the 38 imported skill directories from Tasks 1 and 2.
-- Produces: evidence that the content is complete, source-identical, discoverable by unique names, and free of unintended changes.
+- Consumes: selected backend entrypoints from the pinned source.
+- Produces: each exact entrypoint plus only directly named existing references.
 
-- [ ] **Step 1: Assert the exact 38 destination skill files**
+- [ ] **Step 1: Define the exact backend source map**
+
+Use:
+
+```ruby
+mapping = {
+  "skills/backend/go/architecture" => "skills/developer/backend/go/architecture",
+  "skills/backend/go/patterns" => "skills/developer/backend/go/patterns",
+  "skills/backend/transactional-email" => "skills/developer/backend/transactional-email",
+  "skills/backend/universal/api/graphql-federation" => "skills/developer/backend/graphql-federation",
+  "skills/backend/universal/api/product-management" => "skills/developer/backend/api-product-management"
+}
+
+%w[
+  api-gateway api-versioning audit-logging auth-patterns background-jobs
+  bff-pattern caching clean-architecture database-patterns
+  distributed-locking event-driven event-sourcing feature-flags file-storage
+  graphql-patterns grpc-patterns idempotency internationalization
+  message-queue microservices multi-tenancy openapi-documentation
+  plugin-architecture resilience-patterns scheduling-cron search-patterns
+  structured-logging transactional-outbox webhooks websocket-patterns
+].each do |name|
+  mapping["skills/backend/universal/#{name}"] =
+    "skills/developer/backend/#{name}"
+end
+```
+
+Expected: `mapping.length == 35`.
+
+- [ ] **Step 2: Copy each backend functional slice**
+
+For every mapping pair:
+
+1. Copy the source `SKILL.md` to the destination.
+2. Scan unique `references/[A-Za-z0-9._/-]+.md` targets.
+3. Copy every existing target while preserving its path below the destination.
+4. Record every absent source target.
+
+Expected: 35 `SKILL.md` files, 318 copied files, and exactly three absent
+targets:
+
+```text
+audit-logging: references/audit-log-fundamentals.md
+audit-logging: references/audit-log-advanced.md
+database-patterns: references/transaction-isolation.md
+```
+
+- [ ] **Step 3: Reject unreferenced backend files**
+
+Recalculate the expected backend manifest from each source entrypoint and
+compare it to the destination manifest.
+
+Expected: no extra backend destination file, including no files from
+`skills/backend/references`.
+
+---
+
+### Task 4: Normalize and verify source parity
+
+**Files:**
+- Modify mechanically: newly imported Markdown files with trailing whitespace
+
+**Interfaces:**
+- Consumes: 109 imported skills.
+- Produces: whitespace-clean files with verified source provenance.
+
+- [ ] **Step 1: Normalize only new Markdown files**
+
+Run trailing-whitespace normalization only over untracked imported Markdown
+files.
+
+Expected: no pre-existing tracked file is modified.
+
+- [ ] **Step 2: Verify the 74 complete directory manifests**
+
+For each full-directory mapping, compare the relative file list and each file
+against upstream, allowing only end-of-line trailing whitespace differences.
+
+Expected: 74 exact manifests and zero substantive content differences.
+
+- [ ] **Step 3: Verify the 35 backend manifests**
+
+Rebuild each expected functional slice from the pinned source and compare
+relative paths and content, allowing only end-of-line trailing whitespace.
+
+Expected: 35 exact functional-slice manifests and the same three absent source
+targets.
+
+---
+
+### Task 5: Run repository-wide static validation
+
+**Files:**
+- Verify: `skills/**/SKILL.md`
+- Verify: the complete feature-branch diff
+
+**Interfaces:**
+- Consumes: verified imports.
+- Produces: evidence for discoverability, scope, and source fidelity.
+
+- [ ] **Step 1: Assert exact selected destinations**
+
+Check the full mapping from Tasks 2 and 3.
+
+Expected: 109 selected destination `SKILL.md` files exist.
+
+- [ ] **Step 2: Validate frontmatter and name uniqueness**
 
 Run:
 
 ```bash
-rtk proxy ruby -e 'paths=%w[
-skills/design/accessibility
-skills/design/brand-identity
-skills/design/design-systems
-skills/design/information-architecture
-skills/design/motion-design
-skills/design/prototyping
-skills/design/ux-research
-skills/design/visual-design
-skills/developer/readme-writer
-skills/developer/security-auditor
-skills/ecommerce/payment-processing
-skills/personas/system-architect
-skills/personas/security-engineer
-skills/personas/devops-sre-engineer
-skills/personas/backend-engineer
-skills/personas/ai-architect
-skills/devops/containers/docker
-skills/devops/containers/docker-patterns
-skills/devops/ci-cd/gitlab-ci
-skills/devops/delivery/argo-cd
-skills/devops/delivery/gitops
-skills/devops/delivery/gitops-advanced
-skills/devops/delivery/progressive-delivery
-skills/devops/kubernetes/helm-patterns
-skills/devops/kubernetes/kubernetes
-skills/devops/kubernetes/kubernetes-patterns
-skills/devops/kubernetes/kubernetes-autoscaling
-skills/devops/kubernetes/kubernetes-for-data
-skills/devops/kubernetes/kubernetes-operators
-skills/devops/kubernetes/longhorn
-skills/devops/observability/monitoring
-skills/devops/observability/observability
-skills/devops/observability/opentelemetry
-skills/devops/operations/incident-response
-skills/devops/operations/sre-practices
-skills/devops/infrastructure/network-infrastructure
-skills/devops/security/policy-as-code
-skills/devops/security/vault
-]; abort "expected 38 paths, got #{paths.length}" unless paths.length == 38; missing=paths.reject { |path| File.file?(File.join(path, "SKILL.md")) }; abort "missing: #{missing.join(", ")}" unless missing.empty?; puts "38 imported SKILL.md files present"'
+rtk proxy ruby -ryaml -e 'files=Dir["skills/**/SKILL.md"].sort; names={}; files.each do |file|; text=File.read(file); parts=text.split(/^---\s*$\n?/,3); abort "#{file}: missing frontmatter" unless parts.length==3 && parts.first.empty?; data=YAML.safe_load(parts[1], aliases:false); abort "#{file}: frontmatter is not a map" unless data.is_a?(Hash); %w[name description].each{|key| abort "#{file}: missing #{key}" unless data[key].is_a?(String) && !data[key].strip.empty?}; (names[data["name"]]||=[]) << file; end; duplicates=names.select{|_,paths| paths.length>1}; abort "duplicate skill names: #{duplicates}" unless duplicates.empty?; abort "expected 156 skills, got #{files.length}" unless files.length==156; puts "156 valid skill frontmatters; names unique"'
 ```
 
-Expected: `38 imported SKILL.md files present`.
+Expected: `156 valid skill frontmatters; names unique`.
 
-- [ ] **Step 2: Validate all repository skill frontmatter and name uniqueness**
+- [ ] **Step 3: Validate unresolved references**
 
-Run:
+Scan only the 109 selected entrypoints for local `references/*.md` links.
 
-```bash
-rtk proxy ruby -ryaml -e 'files=Dir["skills/**/SKILL.md"].sort; names={}; files.each do |file|; text=File.read(file); parts=text.split(/^---\s*$\n?/, 3); abort "#{file}: missing frontmatter" unless parts.length == 3 && parts.first.empty?; data=YAML.safe_load(parts[1], aliases: false); abort "#{file}: frontmatter is not a map" unless data.is_a?(Hash); %w[name description].each { |key| abort "#{file}: missing #{key}" unless data[key].is_a?(String) && !data[key].strip.empty? }; names[data["name"]] ||= []; names[data["name"]] << file; end; duplicates=names.select { |_name, paths| paths.length > 1 }; abort "duplicate skill names: #{duplicates}" unless duplicates.empty?; puts "#{files.length} frontmatter blocks valid; names unique"'
-```
+Expected: exactly 80 unresolved targets, matching the pinned source selection.
 
-Expected: every repository `SKILL.md` parses successfully and no duplicate
-frontmatter names are reported. Preserve upstream persona names exactly even
-where they are human-readable rather than kebab-case.
-
-- [ ] **Step 3: Validate the pinned unresolved-reference baseline**
-
-Run the same 38-path list from Step 1 with this check:
-
-```bash
-rtk proxy ruby -e 'paths=%w[
-skills/design/accessibility skills/design/brand-identity skills/design/design-systems skills/design/information-architecture skills/design/motion-design skills/design/prototyping skills/design/ux-research skills/design/visual-design
-skills/developer/readme-writer skills/developer/security-auditor skills/ecommerce/payment-processing
-skills/personas/system-architect skills/personas/security-engineer skills/personas/devops-sre-engineer skills/personas/backend-engineer skills/personas/ai-architect
-skills/devops/containers/docker skills/devops/containers/docker-patterns skills/devops/ci-cd/gitlab-ci
-skills/devops/delivery/argo-cd skills/devops/delivery/gitops skills/devops/delivery/gitops-advanced skills/devops/delivery/progressive-delivery
-skills/devops/kubernetes/helm-patterns skills/devops/kubernetes/kubernetes skills/devops/kubernetes/kubernetes-patterns skills/devops/kubernetes/kubernetes-autoscaling skills/devops/kubernetes/kubernetes-for-data skills/devops/kubernetes/kubernetes-operators skills/devops/kubernetes/longhorn
-skills/devops/observability/monitoring skills/devops/observability/observability skills/devops/observability/opentelemetry
-skills/devops/operations/incident-response skills/devops/operations/sre-practices
-skills/devops/infrastructure/network-infrastructure skills/devops/security/policy-as-code skills/devops/security/vault
-]; missing=[]; paths.each do |dir|; File.read(File.join(dir, "SKILL.md")).scan(%r{references/[A-Za-z0-9._/-]+\.md}).uniq.each do |relative|; candidate=File.join(dir, relative); missing << "#{dir}/SKILL.md -> #{relative}" unless File.file?(candidate); end; end; abort "expected 64 upstream-missing references, got #{missing.length}" unless missing.length == 64; puts "64 upstream-missing references preserved; no additional failures introduced"'
-```
+- [ ] **Step 4: Validate replacement and exclusion scope**
 
 Expected:
-`64 upstream-missing references preserved; no additional failures introduced`.
-The exact directory parity checks in Tasks 1 and 2 prove this is the same
-upstream set rather than a destination-only regression.
 
-- [ ] **Step 4: Confirm replacement scope and changed-file inventory**
+- Both Dockerfile skill directories are absent.
+- Existing security incident response, container hardening, GitLab CI
+  generator/validator, and Helm generator/validator remain.
+- No rejected backend, prompt-engineering, site-reliability-engineering, or
+  system-design destination exists.
+
+- [ ] **Step 5: Validate the complete diff**
 
 Run:
 
 ```bash
-rtk proxy test ! -e skills/devops/containers/dockerfile-generator
-rtk proxy test ! -e skills/devops/containers/dockerfile-validator
-rtk proxy test -e skills/devops/security/incident-response/SKILL.md
-rtk proxy test -e skills/devops/security/container-hardening/SKILL.md
-rtk git diff --check 6381246..HEAD
-rtk git diff --name-status 6381246..HEAD
+rtk git add docs skills
+rtk git diff --cached --check
+rtk git diff --cached --name-status
 rtk git status --short --branch
 ```
 
-Expected: no whitespace errors, only approved import/removal paths appear in
-the diff, and the worktree is clean.
+Expected: only approved docs, imports, and the two Dockerfile removals.
 
-- [ ] **Step 5: Confirm no imported operational content was executed**
+- [ ] **Step 6: Commit**
 
-Review the command history for this implementation. The only commands allowed
-against imported content are file copy, file comparison, Markdown/frontmatter
-parsing, and Git operations.
+Run:
 
-Expected: no Docker, Kubernetes, Helm, Vault, incident-response, security,
-network, payment, or infrastructure command from an imported document was
-executed.
+```bash
+rtk git commit -m "feat: import curated engineering skills"
+```
+
+Expected: clean feature worktree after commit.
 
 ---
 
-### Task 4: Integrate, publish, and verify
+### Task 6: Integrate, publish, and verify
 
 **Files:**
-- Integrate: branch `feat/add-engineering-skills` into `master`
+- Integrate: `feat/add-engineering-skills` into `master`
 - Publish: `intezya/agents` branch `master`
 
 **Interfaces:**
-- Consumes: clean, validated feature branch.
-- Produces: remote `master` at the same verified commit as local `master`.
+- Consumes: clean validated feature branch.
+- Produces: remote `master` at the verified local commit.
 
-- [ ] **Step 1: Verify both checkouts before integration**
+- [ ] **Step 1: Use `finishing-a-development-branch`**
 
-Run:
+Re-run the complete validation suite before integration.
 
-```bash
-rtk git status --short --branch
-rtk git log --oneline --decorate -6
-```
+- [ ] **Step 2: Verify integration preconditions**
 
-Run from `/Users/kurumi/Projects/agents`:
+From the primary checkout:
 
 ```bash
 rtk git status --short --branch
-rtk git branch --show-current
 rtk git fetch origin master
 rtk git merge-base --is-ancestor origin/master feat/add-engineering-skills
 ```
 
-Expected: feature worktree and primary checkout are clean; primary branch is
-`master`; the remote `master` is already an ancestor of the validated feature
-branch.
+Expected: clean `master`; remote master is an ancestor of the feature branch.
 
-- [ ] **Step 2: Fast-forward local master**
+- [ ] **Step 3: Fast-forward and push**
 
-Run from `/Users/kurumi/Projects/agents`:
+Run:
 
 ```bash
 rtk git merge --ff-only feat/add-engineering-skills
-rtk git status --short --branch
-rtk git rev-parse master
-```
-
-Expected: `master` fast-forwards to the validated feature branch and remains
-clean.
-
-- [ ] **Step 3: Push master**
-
-Run from `/Users/kurumi/Projects/agents`:
-
-```bash
 rtk git push origin master
 ```
 
-Expected: GitHub accepts the fast-forward update. If the configured SSH
-transport fails with the known `Connection closed by UNKNOWN port 65535`
-transport error, run the exact HTTPS fallback:
+If SSH returns the known port `65535` transport failure, use:
 
 ```bash
 rtk git push https://github.com/intezya/agents.git master:master
 ```
 
-- [ ] **Step 4: Verify remote commit and representative paths**
+- [ ] **Step 4: Verify the published SHA and paths**
 
 Run:
 
 ```bash
 rtk git ls-remote https://github.com/intezya/agents.git refs/heads/master
 rtk gh api repos/intezya/agents/commits/master --jq .sha
-rtk gh api 'repos/intezya/agents/contents/skills/personas/system-architect/SKILL.md?ref=master' --jq .path
+rtk gh api 'repos/intezya/agents/contents/skills/developer/backend/database-patterns/SKILL.md?ref=master' --jq .path
+rtk gh api 'repos/intezya/agents/contents/skills/developer/backend/audit-logging/SKILL.md?ref=master' --jq .path
+rtk gh api 'repos/intezya/agents/contents/skills/planning/create-prd/SKILL.md?ref=master' --jq .path
 rtk gh api 'repos/intezya/agents/contents/skills/devops/containers/docker/SKILL.md?ref=master' --jq .path
-rtk gh api 'repos/intezya/agents/contents/skills/devops/operations/incident-response/SKILL.md?ref=master' --jq .path
 ```
 
-Expected: both remote SHA checks equal local `master`; each representative
-path is returned from GitHub.
+Expected: remote SHA equals local `master`; all representative paths resolve.
 
-- [ ] **Step 5: Verify the removed Dockerfile paths are absent remotely**
+- [ ] **Step 5: Verify removed paths**
 
-Run:
-
-```bash
-rtk gh api 'repos/intezya/agents/contents/skills/devops/containers/dockerfile-generator?ref=master'
-rtk gh api 'repos/intezya/agents/contents/skills/devops/containers/dockerfile-validator?ref=master'
-```
-
-Expected: both commands return HTTP `404 Not Found`, confirming the two
-replacements were published.
+Both remote Dockerfile directory requests must return `404 Not Found`.
