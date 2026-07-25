@@ -111,6 +111,13 @@ Use a temporary checkout of the pinned upstream commit as the source. Copy
 complete directories into the approved destinations without rewriting their
 content. Record and investigate any unavoidable source-parity exception.
 
+The pinned source contains trailing spaces in selected Markdown files and 64
+local `references/*.md` targets that are named by imported `SKILL.md` files
+but absent upstream. Normalize trailing spaces so repository whitespace
+validation can pass, then compare content while ignoring end-of-line
+whitespace. Preserve and report the upstream unresolved-reference set; do not
+invent missing reference documents or silently retarget links.
+
 Do not execute commands or operational examples embedded in imported
 documentation. Imported rollback, scaling, incident-response, security, and
 infrastructure commands remain reference material requiring human review,
@@ -123,10 +130,12 @@ Before completion:
 
 1. Confirm all 38 expected `SKILL.md` files exist at their destination.
 2. Compare every imported directory against its pinned upstream source,
-   including file manifests and file contents.
+   including file manifests and file contents, ignoring only normalized
+   end-of-line whitespace.
 3. Validate every imported `SKILL.md` frontmatter block and confirm skill
    names are unique across the repository.
-4. Check that local Markdown references resolve within each imported skill.
+4. Confirm the destination unresolved-reference set matches the 64-reference
+   pinned upstream baseline, with no additional missing targets introduced.
 5. Confirm the two replaced Dockerfile skill directories are absent and no
    other existing skills were removed.
 6. Run `git diff --check` and inspect the complete changed-file inventory.
@@ -140,6 +149,7 @@ Before completion:
 - Only the two explicitly replaced Dockerfile skills are removed.
 - Both incident-response specialties remain discoverable under distinct
   frontmatter names.
-- Imported files match the pinned upstream source.
+- Imported files match the pinned upstream source except for normalized
+  trailing whitespace.
 - Static validation passes without executing imported operational commands.
 - The published `master` branch contains and exposes the verified result.
