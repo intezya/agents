@@ -1,0 +1,4 @@
+interface:
+  display_name: "Linear Task Workflow"
+  short_description: "Guide Linear issue status and comments"
+  default_prompt: "Use $linear-task-workflow to work a Linear issue from intake through PR closeout."
