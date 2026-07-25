@@ -1,0 +1,4 @@
+interface:
+  display_name: "CDN Transport"
+  short_description: "Operate CDN-backed VPN transports safely"
+  default_prompt: "Use $cdn-transport to plan, configure, and verify a CDN-backed XHTTP VPN transport."

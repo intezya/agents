@@ -1,0 +1,4 @@
+interface:
+  display_name: "Self-Steal VPN"
+  short_description: "Deploy self-steal fake-site and routing guards"
+  default_prompt: "Use $selfsteal to add a fake site, client direct rules, and safe firewall guards for a VPN node."
