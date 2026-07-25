@@ -1,9 +1,10 @@
 # Useful Local Skills Import Design
 
 **Date:** 2026-07-25
-**Status:** Approved in conversation
+**Status:** Approved in conversation; remote-baseline amendment pending review
 **Branch:** `feat/add-useful-local-skills`
 **Task tracker:** No task will be created
+**Remote baseline:** `c6d01529e9d68048d5dc537c65a8431c365802ad` with 165 skills
 
 ## Goal
 
@@ -30,8 +31,8 @@ Import exactly these nine skills:
 | `~/.codex/skills/agent-browser` | `skills/base/agent-browser` |
 | `~/.codex/skills/find-skills` | `skills/base/find-skills` |
 
-The expected repository total after import is 165 `SKILL.md` files: the
-current 156 plus these nine additions.
+The expected repository total after import is 174 `SKILL.md` files: the
+remote baseline's 165 plus these nine additions.
 
 ## Source Snapshot
 
@@ -97,6 +98,12 @@ All changes happen in the dedicated worktree:
 /Users/kurumi/Projects/agents/.worktrees/feat-add-useful-local-skills
 ```
 
+The remote `master` advanced after the initial design approval. Before the
+import, fetch the remote, verify that `master` still points to the recorded
+baseline, and rebase this feature branch onto it. If the remote advances
+again, repeat the count, destination, and name-collision checks before
+changing the expected total.
+
 The primary checkout currently contains unrelated user-owned deletions under
 `skills/devops/kubernetes/kubernetes-autoscaling`. Those deletions are outside
 this task and must remain untouched.
@@ -124,7 +131,7 @@ changed.
 
 - Parse YAML frontmatter in every repository `SKILL.md`.
 - Require non-empty string values for `name` and `description`.
-- Require exactly 165 skills and 165 unique names.
+- Require exactly 174 skills and 174 unique names.
 - Verify every imported relative reference to a bundled file resolves.
 - Confirm the two removed references no longer appear.
 
@@ -169,7 +176,7 @@ The work is complete when:
 2. all supporting files are retained;
 3. only the two approved dangling instructions differ semantically from the
    local snapshots;
-4. repository-wide skill validation reports 165 valid unique skills;
+4. repository-wide skill validation reports 174 valid unique skills;
 5. static reference, syntax, secret, manifest, and Git checks pass;
 6. the primary checkout's unrelated deletions were never included;
 7. GitHub `master` matches the verified local commit.
