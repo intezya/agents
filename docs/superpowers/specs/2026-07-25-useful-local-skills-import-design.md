@@ -101,7 +101,7 @@ The primary checkout currently contains unrelated user-owned deletions under
 `skills/devops/kubernetes/kubernetes-autoscaling`. Those deletions are outside
 this task and must remain untouched.
 
-The staged implementation diff may contain only:
+The complete branch diff may contain only:
 
 - additions below the nine approved destinations;
 - the design and implementation-plan documents for this task.
@@ -148,7 +148,7 @@ changed.
   validation.
 - Push `master` to `https://github.com/intezya/agents.git`.
 - Verify local HEAD, `git ls-remote`, and the GitHub API report the same SHA.
-- Verify representative remote paths for all nine skills.
+- Verify the remote `SKILL.md` path for each of the nine skills.
 
 ## Failure Handling
 
