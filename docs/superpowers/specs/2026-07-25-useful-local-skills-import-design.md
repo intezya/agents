@@ -1,7 +1,7 @@
 # Useful Local Skills Import Design
 
 **Date:** 2026-07-25
-**Status:** Approved in conversation, including the remote-baseline amendment
+**Status:** Approved in conversation, including remote-baseline and Python-whitespace amendments
 **Branch:** `feat/add-useful-local-skills`
 **Task tracker:** No task will be created
 **Remote baseline:** `c6d01529e9d68048d5dc537c65a8431c365802ad` with 165 skills
@@ -88,6 +88,14 @@ For imported Markdown files only:
 - remove trailing spaces and tabs;
 - end each file with exactly one newline.
 
+Additionally, remove spaces and tabs from the 53 otherwise blank lines in:
+
+- `lint-and-validate/scripts/lint_runner.py`;
+- `lint-and-validate/scripts/type_coverage.py`.
+
+This non-semantic normalization is required for a clean `git diff --check`
+and was approved after raw Git exposed diagnostics hidden by RTK.
+
 All other file bytes must match the approved local snapshot.
 
 ## Isolation and Change Boundaries
@@ -124,7 +132,8 @@ changed.
 - Confirm all nine destinations are absent before import.
 - Compare each destination manifest with its source manifest.
 - Compare file content exactly after applying only the documented Markdown
-  normalization and two dangling-reference removals.
+  normalization, Python blank-line normalization, and two dangling-reference
+  removals.
 - Reject symlinks and unexpected files.
 
 ### Skill Structure

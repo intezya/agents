@@ -18,6 +18,7 @@
 - Expect 48 imported regular files and 174 repository `SKILL.md` files after import.
 - Reject every symlink, changed source digest, occupied destination, duplicate skill name, unresolved bundled-file reference, unexpected file, secret candidate, machine-specific credential path, or syntax failure.
 - Normalize imported Markdown only: LF line endings, no trailing spaces or tabs, and exactly one final newline.
+- Remove spaces and tabs from exactly 53 otherwise blank lines in `skills/base/lint-and-validate/scripts/lint_runner.py` and `skills/base/lint-and-validate/scripts/type_coverage.py`.
 - Remove only the dangling `resources/implementation-playbook.md` instruction from `devops-troubleshooter/SKILL.md` and `docs-architect/SKILL.md`.
 - Preserve every other imported file byte-for-byte.
 - Do not invent license or provenance metadata; the approved design remains the provenance record.
@@ -25,6 +26,11 @@
 - Do not include the primary checkout's 16 user-owned deletions below `skills/devops/kubernetes/kubernetes-autoscaling`.
 - Do not install dependencies or execute imported research, browser, lint, network, or operational workflows.
 - Never force-push.
+
+The Python blank-line normalization was approved during Task 4 after raw Git
+reported diagnostics that RTK had hidden while preserving the nonzero exit
+code. The existing local import commit is followed by a dedicated normalization
+commit so the final branch tree satisfies this plan.
 
 ## File Structure
 
@@ -333,7 +339,7 @@ puts "copied 9 complete skill directories"
 
 Expected: `copied 9 complete skill directories`.
 
-- [ ] **Step 4: Normalize only imported Markdown**
+- [ ] **Step 4: Normalize only the approved imported text**
 
 Run:
 
@@ -367,6 +373,28 @@ puts "normalized 30 imported Markdown files"
 ```
 
 Expected: `normalized 30 imported Markdown files`.
+
+Then run:
+
+```bash
+rtk proxy ruby -e '
+paths = %w[
+  skills/base/lint-and-validate/scripts/lint_runner.py
+  skills/base/lint-and-validate/scripts/type_coverage.py
+]
+changed = 0
+paths.each do |path|
+  text = File.binread(path)
+  count = text.scan(/^[ \t]+(?=\r?$)/).length
+  changed += count
+  File.binwrite(path, text.gsub(/^[ \t]+(?=\r?$)/, ""))
+end
+abort "expected 53 normalized blank lines, got #{changed}" unless changed == 53
+puts "normalized 53 Python blank lines"
+'
+```
+
+Expected: `normalized 53 Python blank lines`.
 
 - [ ] **Step 5: Remove the two approved dangling instructions**
 
@@ -456,6 +484,7 @@ mapping = {
   "find-skills" => "skills/base/find-skills"
 }
 transformed_entrypoints = %w[devops-troubleshooter docs-architect]
+normalized_python = %w[scripts/lint_runner.py scripts/type_coverage.py]
 needle = "- If detailed examples are required, open `resources/implementation-playbook.md`.\n"
 list_files = lambda do |root|
   entries = Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH)
@@ -482,6 +511,7 @@ mapping.each do |name, destination|
   source_manifest.each do |relative|
     expected = File.binread(File.join(source, relative))
     expected = normalize_markdown.call(expected, "#{name}/#{relative}") if relative.end_with?(".md")
+    expected = expected.gsub(/^[ \t]+(?=\r?$)/, "") if name == "lint-and-validate" && normalized_python.include?(relative)
     if transformed_entrypoints.include?(name) && relative == "SKILL.md"
       count = expected.scan(needle).length
       abort "#{name}: expected one source instruction, got #{count}" unless count == 1
