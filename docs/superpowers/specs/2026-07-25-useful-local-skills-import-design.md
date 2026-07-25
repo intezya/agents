@@ -1,7 +1,7 @@
 # Useful Local Skills Import Design
 
 **Date:** 2026-07-25
-**Status:** Approved in conversation; remote-baseline amendment pending review
+**Status:** Approved in conversation, including the remote-baseline amendment
 **Branch:** `feat/add-useful-local-skills`
 **Task tracker:** No task will be created
 **Remote baseline:** `c6d01529e9d68048d5dc537c65a8431c365802ad` with 165 skills
