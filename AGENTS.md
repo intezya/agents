@@ -1,6 +1,7 @@
 # Workflow
 
 - Always use the `using-superpowers` skill at the start of every task, before responding or taking any action.
+- Use the `ask-questions-if-underspecified` skill before implementation whenever the request has multiple plausible interpretations or lacks essential requirements.
 
 # Git Workflow
 
