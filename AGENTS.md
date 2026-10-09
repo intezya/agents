@@ -1,7 +1,12 @@
 # Workflow
 
 - Always use the `using-superpowers` skill at the start of every task, before responding or taking any action.
+- Always use the `superpowers:brainstorming` skill for every task, before implementation.
 - Use the `ask-questions-if-underspecified` skill before implementation whenever the request has multiple plausible interpretations or lacks essential requirements.
+
+# Service Removal
+
+- When removing a service, check its associated domains and DNS records at the provider (for example, Cloudflare). Delete records that are no longer used as part of the service removal, without requiring a separate reminder. Before deleting a record, verify that no other service needs it; afterwards, verify its absence at the provider. Removing a domain from Dokploy does not by itself remove the DNS record.
 
 # Git Workflow
 
