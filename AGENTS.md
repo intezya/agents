@@ -4,6 +4,16 @@
 - Always use the `superpowers:brainstorming` skill for every task, before implementation.
 - Use the `ask-questions-if-underspecified` skill before implementation whenever the request has multiple plausible interpretations or lacks essential requirements.
 
+# Vault Access
+
+- For authorized Vault tasks, prefer the installed official `vault` CLI, including
+  a locally configured wrapper/token helper, over a new ad hoc client.
+- Use `skills/devops/security/vault/SKILL.md` and its agent CLI reference. Discover
+  local authentication and TLS instructions before accessing a deployment.
+- Capture secret-bearing CLI responses inside a local process and pass only the
+  required values to the authorized consumer through private stdin or files.
+  Never expose them in tool output, chat, Git, logs, command arguments, or tracing.
+
 # Service Removal
 
 - When removing a service, check its associated domains and DNS records at the provider (for example, Cloudflare). Delete records that are no longer used as part of the service removal, without requiring a separate reminder. Before deleting a record, verify that no other service needs it; afterwards, verify its absence at the provider. Removing a domain from Dokploy does not by itself remove the DNS record.

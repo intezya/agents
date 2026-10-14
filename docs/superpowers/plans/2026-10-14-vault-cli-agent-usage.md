@@ -21,9 +21,9 @@
 - Modify: `skills/devops/security/vault/SKILL.md`
 - Create: `skills/devops/security/vault/references/agent-cli-usage.md`
 
-- [ ] Add repository-wide preference for the installed official CLI and link to the skill.
-- [ ] Add operational CLI routing before the existing infrastructure workflow; move existing nonstandard frontmatter fields under `metadata` for Codex validation.
-- [ ] Document metadata commands, environment-specific SSO, protected token-helper IPC, and captured secret handoff through subprocess stdin.
-- [ ] Run `python3 /home/intezya/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/devops/security/vault`; expect a valid skill.
-- [ ] Compile and exercise the reference example with fake producer and consumer processes; assert exact delivery and no secret on stdout/stderr, including failure paths.
-- [ ] Run `git diff --check`, review the staged diff, commit, push the task branch, create a PR against `master`, and register its URL with this thread.
+- [x] Add repository-wide preference for the installed official CLI and link to the skill.
+- [x] Add operational CLI routing before the existing infrastructure workflow; move existing nonstandard frontmatter fields under `metadata` for Codex validation.
+- [x] Document metadata commands, environment-specific SSO, protected token-helper IPC, and captured secret handoff through subprocess stdin.
+- [x] Run `python3 /home/intezya/.codex/skills/.system/skill-creator/scripts/quick_validate.py skills/devops/security/vault`; expect a valid skill.
+- [x] Compile and exercise the reference example with fake producer and consumer processes; assert exact delivery and no secret on stdout/stderr, including failure paths.
+- [x] Run `git diff --check`, review the staged diff, commit, push the task branch, create a PR against `master`, and register its URL with this thread.
