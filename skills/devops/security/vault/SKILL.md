@@ -9,21 +9,40 @@ description: >
   transit encryption, Vault Agent, Vault+Kubernetes integration.
   Do NOT use this for: AWS Secrets Manager, Azure Key Vault, or non-HashiCorp
   secret stores.
-version: "1.0.0"
-author: "j4flmao"
 license: "MIT"
-compatibility:
-  claude-code: true
-  cursor: true
-  codex: true
-  windsurf: true
-tags: [devops, vault, secrets, security, phase-5]
+metadata:
+  version: "1.0.0"
+  author: "j4flmao"
+  compatibility:
+    claude-code: true
+    cursor: true
+    codex: true
+    windsurf: true
+  tags: [devops, vault, secrets, security, phase-5]
 ---
 
 # Vault
 
 ## Purpose
 Manage secrets, encryption, and access control using HashiCorp Vault.
+
+## Agent CLI Access
+
+For an existing deployment, prefer the installed official `vault` CLI and any
+locally documented wrapper/token helper. Before retrieving secrets or diagnosing
+CLI authentication, read [Agent CLI usage](references/agent-cli-usage.md).
+Discover the approved endpoint, TLS configuration, authentication workflow, and
+mount/path locally; do not assume an environment-specific helper is installed.
+
+Capture secret-bearing responses inside a local process. Send only the required
+values to the authorized consumer through private stdin/files; never emit them to
+tool output, chat, Git, logs, command arguments, or shell tracing. Token-helper
+`get` output is private IPC for the CLI; do not invoke it directly.
+
+For CLI-only work, completion means the requested read or consumer handoff works
+within existing access. The infrastructure setup checklist below applies only to
+explicitly requested setup work; it does not authorize enabling engines, creating
+tokens, changing policies, or running initialization examples.
 
 ## Agent Protocol
 
