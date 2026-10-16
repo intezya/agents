@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deployment checks"
+  short_description: "Verify readiness, rollback and release health"
+  default_prompt: "Use $deploy-check to check this release before deployment and verify health afterwards."
