@@ -25,7 +25,7 @@ metadata, using existing project runbooks and locally documented access helpers.
   SSO redirect mismatch, effective roles and expired helper credentials.
 - [x] Copy only the three validated skill directories to `~/.codex/skills` and
   compare installed contents with their repository sources.
-- [ ] Commit, push, create a PR against `master`, and register it with this thread.
+- [x] Commit, push, create a PR against `master`, and register it with this thread.
 
 ## Validation evidence
 
@@ -40,3 +40,5 @@ metadata, using existing project runbooks and locally documented access helpers.
   requires the originally failing protected operation.
 - These checks validate instruction behavior in simulated cases, not live service
   access, actual deployment or successful production authentication.
+
+Published as https://github.com/intezya/agents/pull/6.
