@@ -1,7 +1,11 @@
 ---
 name: monitoring
 description: >
-  Use this skill when configuring observability and monitoring stack — Prometheus, Grafana, Loki, ELK Stack. This skill enforces: Prometheus scrape configs with relabeling, Grafana dashboard folder hierarchy, Loki log label strategy, Alertmanager routing by severity, SLO tracking with error budgets. Do NOT use for: application-level instrumentation, CI/CD pipeline monitoring, infrastructure provisioning.
+  Use this skill to configure monitoring platforms and their data pipelines:
+  Prometheus scrape and recording rules, Alertmanager routing, Grafana data
+  sources and dashboards, and Loki or ELK ingestion. Do NOT use it to instrument
+  application code or configure OpenTelemetry SDKs (use observability), design
+  SLI/SLO or error-budget policy (use sre-practices), or provision infrastructure.
 version: "1.0.0"
 author: "j4flmao"
 license: "MIT"
@@ -515,4 +519,6 @@ output.elasticsearch:
   - references/prometheus-setup.md — Prometheus Setup Reference
 ## Handoff
 
-Hand off to `management/alerting/SKILL.md` for alert rule configuration. Hand off to `devops/helm-patterns/SKILL.md` for deploying monitoring stack on Kubernetes. Hand off to `devops/terraform/SKILL.md` for provisioning monitoring infrastructure.
+- Use `skills/devops/observability/promql-generator/SKILL.md` to write PromQL alert rules; use `skills/devops/observability/promql-validator/SKILL.md` to validate them.
+- Use `skills/devops/kubernetes/helm-patterns/SKILL.md` for Helm deployment patterns.
+- For infrastructure provisioning, follow the repository's IaC workflow; this skill does not provision infrastructure.

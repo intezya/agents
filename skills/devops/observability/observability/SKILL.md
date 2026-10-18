@@ -1,14 +1,12 @@
 ---
 name: observability
 description: >
-  Use this skill when the user says 'observability', 'logging', 'metrics',
-  'tracing', 'OpenTelemetry', 'Grafana', 'Prometheus', 'structured logs',
-  'distributed tracing', 'monitoring', or when setting up observability for a
-  service. Covers: three pillars (logs, metrics, traces), structured JSON logging,
-  OpenTelemetry SDK setup per stack, SLO/SLI/SLA definitions, and alert design
-  (alert on symptoms, not causes). Works with any language/stack.
-  Do NOT use this for: infrastructure monitoring, database performance, or
-  frontend analytics.
+  Use this skill to instrument applications and services with structured logs,
+  metrics, distributed traces, and OpenTelemetry SDKs or collectors. Use it to
+  decide what telemetry to emit and how to correlate it. For monitoring-platform
+  configuration (Prometheus, Grafana, Loki, or ELK), use monitoring; for SLI/SLO
+  and error-budget policy, use sre-practices. Do NOT use it for database
+  performance or frontend analytics.
 version: "1.0.0"
 author: "j4flmao"
 license: "MIT"
@@ -535,5 +533,5 @@ slos:
   - references/otel-guide.md — OpenTelemetry Setup per Stack
 ## Handoff
 After completing this skill:
-- Next skill: **performance-profiler** — using observability data to find bottlenecks
+- Next skill: `skills/developer/performance-optimization/SKILL.md` when telemetry identifies a measured performance bottleneck.
 - Pass context: logging format, metrics configuration, trace sampling rate
