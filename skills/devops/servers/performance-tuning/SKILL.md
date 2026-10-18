@@ -359,7 +359,6 @@ fs.file-max = 2097152
 
 ## Related Skills
 
-- `linux-administration` -- General system monitoring and management
 - `systemd-services` -- Resource limits via cgroups in unit files
 - `block-storage` -- Storage-level performance (LVM, RAID, filesystems)
 - `nfs-storage` -- NFS-specific performance tuning

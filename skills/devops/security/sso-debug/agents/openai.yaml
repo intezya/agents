@@ -1,4 +1,0 @@
-interface:
-  display_name: "SSO debugging"
-  short_description: "Trace application OIDC and Keycloak failures"
-  default_prompt: "Use $sso-debug to trace this application login failure through OIDC and Keycloak."

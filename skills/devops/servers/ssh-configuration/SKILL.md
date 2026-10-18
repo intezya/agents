@@ -302,7 +302,6 @@ command="internal-sftp",no-port-forwarding,no-pty ssh-ed25519 AAAA... sftp-uploa
 
 ## Related Skills
 
-- `linux-administration` -- General Linux system administration
 - `user-management` -- Managing the users who connect via SSH
 - `systemd-services` -- Managing sshd as a systemd service
 - `performance-tuning` -- Network tuning for SSH performance

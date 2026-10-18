@@ -1,4 +1,0 @@
-interface:
-  display_name: "Incident triage"
-  short_description: "Investigate outages using bounded evidence"
-  default_prompt: "Use $incident-triage to investigate this service outage and report facts, hypotheses and next checks."
