@@ -489,7 +489,7 @@ baseline_workflow:
 
 ## Handoff
 `quality-e2e-testing` for combined E2E + visual test suite.
-`design-design-systems` for component baseline snapshots.
+`design-system` for component baseline snapshots.
 Carry forward: visual test config, baseline snapshots, review workflow.
 ## Implementation Patterns
 

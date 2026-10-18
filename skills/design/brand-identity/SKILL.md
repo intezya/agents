@@ -1,7 +1,7 @@
 ---
 name: design-brand-identity
 description: >
-  Use when the user asks about brand identity, brand guidelines, visual identity, brand strategy, logo usage, brand voice, or brand consistency. Do NOT use for: visual design (design-visual-design), design systems (design-design-systems), or UX research (design-ux-research).
+  Use when the user asks about brand identity, brand guidelines, visual identity, brand strategy, logo usage, brand voice, or brand consistency. Do NOT use for: visual design (design-visual-design), design systems (design-system), or UX research (design-ux-research).
 version: "2.0.0"
 author: "j4flmao"
 license: "MIT"
@@ -437,7 +437,7 @@ Brand colors must meet WCAG AA minimums:
   - references/logo-design.md — Logo Design Reference
   - references/visual-identity-guidelines.md — Visual Identity Guidelines Reference
 ## Handoff
-Hand off to `design-visual-design` for visual system implementation. Hand off to `design-design-systems` for token/component implementation. Hand off to `design-ux-research` for audience validation.
+Hand off to `design-visual-design` for visual system implementation. Hand off to `design-system` for token/component implementation. Hand off to `design-ux-research` for audience validation.
 ## Implementation Patterns
 
 ### Observer Pattern for Event Handling

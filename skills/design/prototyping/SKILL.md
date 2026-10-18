@@ -1,7 +1,7 @@
 ---
 name: design-prototyping
 description: >
-  Use when the user asks about prototyping, wireframing, interactive mockups, fidelity levels, prototyping tools, user testing prototypes, or design validation. Do NOT use for: visual design (design-visual-design), UX research (design-ux-research), or design systems (design-design-systems).
+  Use when the user asks about prototyping, wireframing, interactive mockups, fidelity levels, prototyping tools, user testing prototypes, or design validation. Do NOT use for: visual design (design-visual-design), UX research (design-ux-research), or design systems (design-system).
 version: "2.0.0"
 author: "j4flmao"
 license: "MIT"

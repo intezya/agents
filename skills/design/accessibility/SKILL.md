@@ -519,6 +519,6 @@ Report quarterly to leadership: total issues, issues fixed, issues added, median
   - references/accessibility-testing-methods.md — Accessibility Testing Methods
   - references/accessible-design-patterns.md — Accessible Design Patterns
 ## Handoff
-`design-design-systems` for accessible component library integration.
+`design-system` for accessible component library integration.
 `quality-visual-testing` for visual regression with a11y states.
 Carry forward: WCAG audit report, ARIA patterns, testing checklist.

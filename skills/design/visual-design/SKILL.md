@@ -1,7 +1,7 @@
 ---
 name: design-visual-design
 description: >
-  Use when the user asks about visual design, color theory, typography, layout, visual hierarchy, spacing, proportion, or UI aesthetics. Do NOT use for: design systems (design-design-systems), UX research (design-ux-research), or prototyping (design-prototyping).
+  Use when the user asks about visual design, color theory, typography, layout, visual hierarchy, spacing, proportion, or UI aesthetics. Do NOT use for: design systems (design-system), UX research (design-ux-research), or prototyping (design-prototyping).
 version: "2.0.0"
 author: "j4flmao"
 license: "MIT"
@@ -593,4 +593,4 @@ Dark mode requires independent color tokens, not simple inversion:
   - references/visual-design-color-system.md — Color System Reference
   - references/visual-design-dark-mode.md — Dark Mode Design Reference
 ## Handoff
-Hand off to `design-design-systems` for token implementation. Hand off to `design-brand-identity` for brand consistency. Hand off to `design-accessibility` for WCAG compliance audit.
+Hand off to `design-system` for token implementation. Hand off to `design-brand-identity` for brand consistency. Hand off to `design-accessibility` for WCAG compliance audit.
